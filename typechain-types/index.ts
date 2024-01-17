@@ -52,8 +52,6 @@ export type { MerkleMultiProof } from "./artifacts/contracts/@Chainlink/contract
 export { MerkleMultiProof__factory } from "./factories/artifacts/contracts/@Chainlink/contracts/src/v0.8/ccip/libraries/MerkleMultiProof__factory";
 export type { CallWithExactGas } from "./artifacts/contracts/@Chainlink/contracts/src/v0.8/shared/call/CallWithExactGas";
 export { CallWithExactGas__factory } from "./factories/artifacts/contracts/@Chainlink/contracts/src/v0.8/shared/call/CallWithExactGas__factory";
-export type { IERC20Permit } from "./artifacts/contracts/@Chainlink/contracts/src/v0.8/vendor/openzeppelin-solidity/v4.8.3/contracts/token/ERC20/extensions/draft-IERC20Permit.sol/IERC20Permit";
-export { IERC20Permit__factory } from "./factories/artifacts/contracts/@Chainlink/contracts/src/v0.8/vendor/openzeppelin-solidity/v4.8.3/contracts/token/ERC20/extensions/draft-IERC20Permit.sol/IERC20Permit__factory";
 export type { BasicMessageReceiver } from "./artifacts/contracts/BasicMessageReceiver";
 export { BasicMessageReceiver__factory } from "./factories/artifacts/contracts/BasicMessageReceiver__factory";
 export type { BasicMessageSender } from "./artifacts/contracts/BasicMessageSender";

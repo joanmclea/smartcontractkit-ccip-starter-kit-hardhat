@@ -6,6 +6,9 @@ import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import {Withdraw} from "./utils/Withdraw.sol";
 
+import "hardhat/console.sol";
+
+
 /**
  * THIS IS AN EXAMPLE CONTRACT THAT USES HARDCODED VALUES FOR CLARITY.
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
@@ -25,6 +28,9 @@ contract BasicMessageSender is Withdraw {
     constructor(address router, address link) {
         i_router = router;
         i_link = link;
+
+        // @dev development only
+        console.log("DEV: BasicMessageSender deployed on chain %d.", block.chainid );
     }
 
     receive() external payable {}
@@ -35,6 +41,9 @@ contract BasicMessageSender is Withdraw {
         string memory messageText,
         PayFeesIn payFeesIn
     ) external {
+        // @Dev development only
+        console.log("DEV:  Sending the message...");
+        
         Client.EVM2AnyMessage memory message = Client.EVM2AnyMessage({
             receiver: abi.encode(receiver),
             data: abi.encode(messageText),

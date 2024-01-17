@@ -1,11 +1,9 @@
 import { task } from "hardhat/config";
 import { HardhatRuntimeEnvironment, TaskArguments } from "hardhat/types";
-import { getPrivateKey, getProviderRpcUrl, getRouterConfig } from "../utils";
-import { Wallet, providers } from "ethers";
 import { MockCCIPRouter, MockCCIPRouter__factory } from "../../typechain-types";
 import { Spinner } from "../../utils/spinner";
 
-import { makeEVMToAnyMessage } from "./dev-utils";
+import { buildEVM2AnyMessage } from "./localdev-utils";
 
 task(
   "deploy-mock-router",
@@ -38,8 +36,4 @@ task(
     `\n✅ ${CONTRACT_NAME} deployed at address ${mockCCIPRouter.address} on ${hre.network.name} blockchain using address ${deployer}`
   );
 
-  const mockFee =  await mockCCIPRouter.getFee(10, makeEVMToAnyMessage());
-  if(mockFee.toNumber() !== 0) {
-    throw new Error(`Mock Fee value expected to be 0, but is ${mockFee.toNumber()}`);
-  }
 });

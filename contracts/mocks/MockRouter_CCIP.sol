@@ -34,6 +34,7 @@ contract MockCCIPRouter is IRouter, IRouterClient {
 
     constructor() {
         test_owner = msg.sender;
+        console.log("ZUBIN: MockCCIPRouter deployed to %s ", address(this));
     }
 
     function routeMessage(
@@ -111,6 +112,10 @@ contract MockCCIPRouter is IRouter, IRouterClient {
             gasLimit,
             receiver
         );
+
+        // @dev development only
+        console.log("DEV:  ccipSend() called with msgId: ");
+        console.logBytes32(mockMsgId);
 
         return mockMsgId;
     }

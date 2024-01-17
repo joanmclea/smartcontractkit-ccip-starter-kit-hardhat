@@ -5,6 +5,9 @@ import {CCIPReceiver} from "@chainlink/contracts-ccip/src/v0.8/ccip/applications
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import {Withdraw} from "./utils/Withdraw.sol";
 
+import "hardhat/console.sol";
+
+
 /**
  * THIS IS AN EXAMPLE CONTRACT THAT USES HARDCODED VALUES FOR CLARITY.
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
@@ -23,7 +26,10 @@ contract BasicMessageReceiver is CCIPReceiver, Withdraw {
         string latestMessage
     );
 
-    constructor(address router) CCIPReceiver(router) {}
+    constructor(address router) CCIPReceiver(router) {
+        // @dev development only
+        console.log("DEV: BasicMessageReceiver deployed on chain %d.", block.chainid );
+    }
 
     function _ccipReceive(
         Client.Any2EVMMessage memory message
