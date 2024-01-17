@@ -93,6 +93,7 @@ export interface MockCCIPRouterInterface extends utils.Interface {
     "getSupportedTokens(uint64)": FunctionFragment;
     "isChainSupported(uint64)": FunctionFragment;
     "routeMessage((bytes32,uint64,bytes,bytes,(address,uint256)[]),uint16,uint256,address)": FunctionFragment;
+    "test_owner()": FunctionFragment;
   };
 
   getFunction(
@@ -104,6 +105,7 @@ export interface MockCCIPRouterInterface extends utils.Interface {
       | "getSupportedTokens"
       | "isChainSupported"
       | "routeMessage"
+      | "test_owner"
   ): FunctionFragment;
 
   encodeFunctionData(
@@ -139,6 +141,10 @@ export interface MockCCIPRouterInterface extends utils.Interface {
       PromiseOrValue<string>
     ]
   ): string;
+  encodeFunctionData(
+    functionFragment: "test_owner",
+    values?: undefined
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "DEFAULT_GAS_LIMIT",
@@ -162,6 +168,7 @@ export interface MockCCIPRouterInterface extends utils.Interface {
     functionFragment: "routeMessage",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "test_owner", data: BytesLike): Result;
 
   events: {
     "MessageExecuted(bytes32,uint64,address,bytes32)": EventFragment;
@@ -243,6 +250,8 @@ export interface MockCCIPRouter extends BaseContract {
       receiver: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    test_owner(overrides?: CallOverrides): Promise<[string]>;
   };
 
   DEFAULT_GAS_LIMIT(overrides?: CallOverrides): Promise<BigNumber>;
@@ -278,6 +287,8 @@ export interface MockCCIPRouter extends BaseContract {
     receiver: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  test_owner(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
     DEFAULT_GAS_LIMIT(overrides?: CallOverrides): Promise<BigNumber>;
@@ -319,6 +330,8 @@ export interface MockCCIPRouter extends BaseContract {
         gasUsed: BigNumber;
       }
     >;
+
+    test_owner(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
@@ -370,6 +383,8 @@ export interface MockCCIPRouter extends BaseContract {
       receiver: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
+
+    test_owner(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -408,5 +423,7 @@ export interface MockCCIPRouter extends BaseContract {
       receiver: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
+
+    test_owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

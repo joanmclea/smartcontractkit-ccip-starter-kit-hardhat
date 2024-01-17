@@ -8,3 +8,6 @@ coverage.json
 cache
 /artifacts
 
+# temporary flattened files
+flattened.sol
+
