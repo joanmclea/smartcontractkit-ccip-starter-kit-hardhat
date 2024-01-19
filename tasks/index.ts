@@ -13,4 +13,4 @@ import './fill-sender';
 import './cross-chain-nft-minter';
 import './localdev/deploy-mock-router';
 import './localdev/deploy-ccip-contracts';
-import './localdev/localdev-sendMessage';
+import './localdev/sendMessage';
