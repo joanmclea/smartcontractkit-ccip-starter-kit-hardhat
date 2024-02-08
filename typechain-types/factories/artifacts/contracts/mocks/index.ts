@@ -2,3 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as mockRouterCcipSol from "./MockRouter_CCIP.sol";
+export { MockBnMToken__factory } from "./MockBnMToken__factory";

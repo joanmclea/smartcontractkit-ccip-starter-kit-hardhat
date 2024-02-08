@@ -11,6 +11,6 @@ import './send-message';
 import './get-message';
 import './fill-sender';
 import './cross-chain-nft-minter';
-import './ccip-mock/mock-deploy-router';
+import './ccip-mock/mock-initial-deploys';
 import './ccip-mock/mock-deploy-client';
 import './ccip-mock/sendAndReceiveMessage';

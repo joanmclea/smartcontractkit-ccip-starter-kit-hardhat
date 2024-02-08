@@ -3,3 +3,4 @@
 /* eslint-disable */
 import type * as mockRouterCcipSol from "./MockRouter_CCIP.sol";
 export type { mockRouterCcipSol };
+export type { MockBnMToken } from "./MockBnMToken";
