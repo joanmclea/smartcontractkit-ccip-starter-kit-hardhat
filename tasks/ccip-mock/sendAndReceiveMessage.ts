@@ -1,7 +1,8 @@
 import { buildEVM2AnyMessage } from "./localdev-utils";
 import { HardhatRuntimeEnvironment, TaskArguments } from "hardhat/types";
-import { task } from "hardhat/config";
+import { task, types } from "hardhat/config";
 import { Spinner } from "../../utils/spinner";
+
 import {
   BasicMessageSender__factory,
   BasicMessageReceiver__factory,
@@ -9,6 +10,7 @@ import {
   BasicMessageReceiver,
 } from "../../typechain-types";
 
+import { Client } from "../../typechain-types/IRouterClient";
 
 task(
   `mock-send-message`,
@@ -20,7 +22,13 @@ task(
   )
   .addParam(
     "receiver",
-    "The CCCIP receiver contract on your stand-alone Hardhat node"
+    "The CCIP receiver contract on your stand-alone Hardhat node"
+  )
+  .addOptionalParam(
+    "message",
+    "The text message to send via CCIP",
+    'Hello CCIP',
+    types.string
   )
   .setAction(
     async (taskArgs: TaskArguments, hre: HardhatRuntimeEnvironment) => {
@@ -30,51 +38,61 @@ task(
         );
       }
 
-      const message = "Hello CCIP"
+      const message = "Hello CCIP";
 
       const [deployer] = await hre.ethers.getSigners();
       const senderContract: BasicMessageSender =
         BasicMessageSender__factory.connect(taskArgs.sender, deployer);
 
-      // const EVM_EXTRA_ARGS_V1_TAG = "0x97a657c9";  
-      // const msgData = hre.ethers.utils.formatBytes32String(message);
+      const MESSAGE = {
+        destinationChainSelector: 0,
+        receiver: taskArgs.receiver,
+        messageText: taskArgs.message,
+        feeTokenAddress: hre.ethers.constants.AddressZero,
+      };
 
-      // const EVM2AnyMessage: RouterClient.EVM2AnyMessageStruct = {
-      //   receiver: taskArgs.receiver,
-      //   data: msgData,
-      //   feeToken: hre.ethers.constants.AddressZero,
-      //   extraArgs: EVM_EXTRA_ARGS_V1_TAG,
-      //   tokenAmounts: [],
-      // };                                                       // TODO @zeuslawyer -- is this needed
-
-      // const builtMessage = buildEVM2AnyMessage(EVM2AnyMessage); 
+      // const builtMessage = buildEVM2AnyMessage(EVM2AnyMessage);
 
       console.log(
-        `\nℹ️  Attempting to send the ${message} message from the BasicMessageSender smart contract (${taskArgs.sender}) on the ${hre.network.name} blockchain to the BasiceMessageReceiver smart contract at ${taskArgs.receiver}}`
+        `\nℹ️  Attempting to send the ${message} message from the BasicMessageSender smart contract (${taskArgs.sender}) on the ${hre.network.name} blockchain to the BasiceMessageReceiver smart contract at ${taskArgs.receiver}} on the same blockchain...`
       );
       const spinner: Spinner = new Spinner();
       spinner.start();
 
       const sendTx = await senderContract.send(
-        0,
-        taskArgs.receiver,
-        "Hello CCIP",
-        hre.ethers.constants.AddressZero
+        MESSAGE.destinationChainSelector,
+        MESSAGE.receiver,
+        MESSAGE.messageText,
+        MESSAGE.feeTokenAddress
       );
       await sendTx.wait();
 
       spinner.stop();
-      console.log(`\n✅ Message sent, transaction hash: ${sendTx.hash}. \n\nMessage details:`);
-
+      console.log(
+        `\n✅ Message sent, transaction hash: ${sendTx.hash}. Message Details: \n`
+      );
+      console.table(MESSAGE);
 
       spinner.start();
-      console.log("\n Checking if message received...")
+      console.log("\nChecking if message received...");
       const receiverContract: BasicMessageReceiver =
-      BasicMessageReceiver__factory.connect(taskArgs.receiver, deployer);
+        BasicMessageReceiver__factory.connect(taskArgs.receiver, deployer);
 
-      const receivedMessage =  await receiverContract.getLatestMessageDetails()
+      const [
+        lastestMessageIdBytes32,
+        latestSourceChainSelectorBigNum,
+        senderAddress,
+        messageString,
+      ] = await receiverContract.getLatestMessageDetails();
       spinner.stop();
 
-      console.log("\n Received message:  ", receivedMessage) // TODO@zeuslawyer resume here and prettify logs.
+      console.log("\n✅ Message received. Details: \n");
+
+      console.table({
+        messageId: lastestMessageIdBytes32,
+        sourceChainSelector: latestSourceChainSelectorBigNum.toNumber(),
+        sender: senderAddress,
+        message: messageString,
+      });
     }
   );

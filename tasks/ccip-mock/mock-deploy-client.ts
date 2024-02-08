@@ -40,7 +40,7 @@ task(`mock-deploy-client`, `Deploys your sender smart contract to localhost`)
 
       spinner.stop();
       console.log(
-        `✅ ${contractName} deployed at address ${contract.address} on ${hre.network.name} blockchain`
+        `\n✅ ${contractName} deployed at address ${contract.address} on ${hre.network.name} blockchain`
       );
     }
   );
