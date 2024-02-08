@@ -6,7 +6,7 @@ import { Spinner } from "../../utils/spinner";
 import { buildEVM2AnyMessage } from "./localdev-utils";
 
 task(
-  "deploy-mock-router",
+  "mock-deploy-router",
   "Deploys the Mock CCIP Router smart contract"
 ).setAction(async (_: TaskArguments, hre: HardhatRuntimeEnvironment) => {
   if (hre.network.name !== "localhost") {

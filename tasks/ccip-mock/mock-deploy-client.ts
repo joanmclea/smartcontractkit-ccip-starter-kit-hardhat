@@ -3,7 +3,7 @@ import { HardhatRuntimeEnvironment, TaskArguments } from "hardhat/types";
 import { Spinner } from "../../utils/spinner";
 import { BasicMessageSender__factory , BasicMessageReceiver__factory, CCIPReceiver__factory } from "../../typechain-types";
 
-task(`deploy-client`, `Deploys your sender smart contract to localhost`)
+task(`mock-deploy-client`, `Deploys your sender smart contract to localhost`)
   .addParam(
     "mockrouter",
     "The address of the Router contract on your stand-alone Hardhat node"
