@@ -1,4 +1,4 @@
-import { buildEVM2AnyMessage } from "./localdev-utils";
+import { buildEVM2AnyMessage } from "./mock-utils";
 import { HardhatRuntimeEnvironment, TaskArguments } from "hardhat/types";
 import { task, types } from "hardhat/config";
 import { Spinner } from "../../utils/spinner";

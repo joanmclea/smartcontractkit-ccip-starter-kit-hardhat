@@ -3,7 +3,7 @@ import { HardhatRuntimeEnvironment, TaskArguments } from "hardhat/types";
 import { MockCCIPRouter, MockCCIPRouter__factory } from "../../typechain-types";
 import { Spinner } from "../../utils/spinner";
 
-import { buildEVM2AnyMessage } from "./localdev-utils";
+import { buildEVM2AnyMessage } from "./mock-utils";
 
 task(
   "mock-deploy-router",
