@@ -34,7 +34,6 @@ contract MockCCIPRouter is IRouter, IRouterClient {
 
     constructor() {
         test_owner = msg.sender;
-        console.log("ZUBIN: MockCCIPRouter deployed to %s ", address(this));
     }
 
     function routeMessage(

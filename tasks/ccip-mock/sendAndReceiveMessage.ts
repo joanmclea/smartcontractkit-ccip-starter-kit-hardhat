@@ -84,9 +84,9 @@ task(
         senderAddress,
         messageString,
       ] = await receiverContract.getLatestMessageDetails();
+      
       spinner.stop();
-
-      console.log("\n✅ Message received. Details: \n");
+      console.log(`\n✅ Message received in Receiver Contract ${receiverContract.address}. Details: \n`);
 
       console.table({
         messageId: lastestMessageIdBytes32,
