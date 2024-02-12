@@ -1,6 +1,6 @@
 
 # TODO
-1.  token owner does grantMinterRole() and grantBurnerRole()
+1.  BurnMintERC677 token owner invokesfunction grantMintAndBurnRoles(address burnAndMinter) on itself
 2. isMinter() and isBurner() check
 3. send 20 tokens to senderContract
 4. send tokens to receiver
@@ -23,3 +23,17 @@ Note that the setup steps include deploying contracts to your local Hardhat netw
     - deploy the ccip clients (sender and receiver) on to the same network `npx hardhat mock-deploy-client --network localhost --mockrouter <<MOCK ROUTER ADDRESS>> --contract-name <<<BasicMessageSender OR BasicMessageReceiver>>> --contract-type <<sender>> OR <<receiver>>`
 
     - send a message : `npx hardhat mock-send-message --sender <<SENDER CLIENT ADDRESS>> --receiver <<RECEIVER CLIENT ADDRESS>>  --message "let's GO!!" --network localhost`    [note that `--message` is an optional param]
+
+
+
+# Using Existing Tasks
+## EOA to EOA
+```
+npx hardhat ccip-token-transfer \
+--source-blockchain hardhat \
+--destination-blockchain hardhat \
+--receiver 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9 \
+--token-address 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 \
+--amount 10000 \
+--router 0x5FbDB2315678afecb367f032d93F642f64180aa3
+```

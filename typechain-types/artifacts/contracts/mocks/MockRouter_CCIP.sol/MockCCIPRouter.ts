@@ -326,7 +326,7 @@ export interface MockCCIPRouter extends BaseContract {
     ): Promise<
       [boolean, string, BigNumber] & {
         success: boolean;
-        retData: string;
+        retBytes: string;
         gasUsed: BigNumber;
       }
     >;

@@ -2,15 +2,15 @@ import { ethers } from "ethers";
 import fs from "fs";
 import path from "path";
 
-import { Client as RouterClient } from "../../typechain-types/IRouterClient";
+import { Client } from "../../typechain-types/IRouterClient";
 import * as ReceiverInterface from "../../typechain-types/artifacts/@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IAny2EVMMessageReceiver";
 
 const EVM_EXTRA_ARGS_V1_TAG = "0x97a657c9";
 const NOTES_PATH = path.resolve(__dirname, "../../", "notes.env");
 
 export function buildEVM2AnyMessage(
-  message?: Partial<RouterClient.EVM2AnyMessageStruct>
-): RouterClient.EVM2AnyMessageStruct {
+  message?: Partial<Client.EVM2AnyMessageStruct>
+): Client.EVM2AnyMessageStruct {
   const abiCoder = ethers.utils.defaultAbiCoder;
   const ADDRESS_ZERO = ethers.constants.AddressZero;
   const receiver =

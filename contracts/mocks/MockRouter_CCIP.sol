@@ -41,8 +41,9 @@ contract MockCCIPRouter is IRouter, IRouterClient {
         uint16 gasForCallExactCheck,
         uint256 gasLimit,
         address receiver
-    ) external returns (bool success, bytes memory retData, uint256 gasUsed) {
-        return _routeMessage(message, gasForCallExactCheck, gasLimit, receiver);
+    ) external returns (bool success, bytes memory retBytes, uint256 gasUsed) {
+        (success,) =   _routeMessage(message, gasForCallExactCheck, gasLimit, receiver);
+        return (success, retBytes, gasUsed);
     }
 
     function _routeMessage(
@@ -50,19 +51,18 @@ contract MockCCIPRouter is IRouter, IRouterClient {
         uint16 gasForCallExactCheck,
         uint256 gasLimit,
         address receiver
-    ) internal returns (bool success, bytes memory retData, uint256 gasUsed) {
+    ) internal returns (bool success, bool sufficientGas) { 
         bytes memory data = abi.encodeWithSelector(
             IAny2EVMMessageReceiver.ccipReceive.selector,
             message
         );
 
-        (success, retData, gasUsed) = CallWithExactGas
-            ._callWithExactGasSafeReturnData(
+        (success, sufficientGas) = CallWithExactGas
+            ._callWithExactGasEvenIfTargetIsNoContract(
                 data,
                 receiver,
                 gasLimit,
-                gasForCallExactCheck,
-                Internal.MAX_RET_BYTES
+                gasForCallExactCheck// Internal.MAX_RET_BYTES
             );
 
         emit MessageExecuted(
@@ -71,7 +71,7 @@ contract MockCCIPRouter is IRouter, IRouterClient {
             msg.sender,
             keccak256(data)
         );
-        return (success, retData, gasUsed);
+        return (success, sufficientGas);
     }
 
     function ccipSend(

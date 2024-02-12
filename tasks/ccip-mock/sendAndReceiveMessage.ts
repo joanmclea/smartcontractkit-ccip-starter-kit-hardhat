@@ -1,4 +1,3 @@
-import { buildEVM2AnyMessage } from "./mock-utils";
 import { HardhatRuntimeEnvironment, TaskArguments } from "hardhat/types";
 import { task, types } from "hardhat/config";
 import { Spinner } from "../../utils/spinner";
@@ -9,8 +8,6 @@ import {
   BasicMessageSender,
   BasicMessageReceiver,
 } from "../../typechain-types";
-
-import { Client } from "../../typechain-types/IRouterClient";
 
 task(
   `mock-send-message`,
@@ -27,9 +24,10 @@ task(
   .addOptionalParam(
     "message",
     "The text message to send via CCIP",
-    'Hello CCIP',
+    "Hello CCIP",
     types.string
   )
+  .addOptionalParam(`tokenAmounts`, `Array of {token,amount} objects specifying token units to send. Eg: --token-amounts '[{"token":"0xD21341536c5cF5EB1bcb58f6723cE26e8D8E90e4","amount":"100"}]`)
   .setAction(
     async (taskArgs: TaskArguments, hre: HardhatRuntimeEnvironment) => {
       if (hre.network.name !== "localhost") {
@@ -42,7 +40,7 @@ task(
 
       const [deployer] = await hre.ethers.getSigners();
       const senderContract: BasicMessageSender =
-        BasicMessageSender__factory.connect(taskArgs.sender, deployer);
+        BasicMessageSender__factory.connect(taskArgs.sender, deployer); // Zubin @todo ProgrammableTokenTransfers
 
       const MESSAGE = {
         destinationChainSelector: 0,
@@ -84,9 +82,11 @@ task(
         senderAddress,
         messageString,
       ] = await receiverContract.getLatestMessageDetails();
-      
+
       spinner.stop();
-      console.log(`\n✅ Message received in Receiver Contract ${receiverContract.address}. Details: \n`);
+      console.log(
+        `\n✅ Message received in Receiver Contract ${receiverContract.address}. Details: \n`
+      );
 
       console.table({
         messageId: lastestMessageIdBytes32,

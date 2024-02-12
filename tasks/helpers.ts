@@ -14,5 +14,10 @@ export const getCcipMessageId = async (tx: ContractTransaction, receipt: Contrac
     // Simulate a contract call with the transaction data at the block before the transaction
     const messageId = await provider.call(call, receipt.blockNumber - 1);
 
-    console.log(`✅ You can now monitor the token transfer status via CCIP Explorer (https://ccip.chain.link) by searching for CCIP Message ID: ${messageId}`);
+    if (provider.connection.url.includes("127.0.0.1")) {
+        console.log(`CCIP Message ID via the local mock: ${messageId}`)
+    } else {
+        console.log(`✅ You can now monitor the token transfer status via CCIP Explorer (https://ccip.chain.link) by searching for CCIP Message ID: ${messageId}`);
+    }
+
 }
