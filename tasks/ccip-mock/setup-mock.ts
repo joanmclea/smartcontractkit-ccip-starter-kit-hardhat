@@ -101,21 +101,5 @@ subtask(
       "ether"
     )} BnM tokens to ${tokenOwner} `
   );
-
-  // console.log(
-  //   `\n3️⃣ Approving ${ROUTER_ADDRESS} to spend ${hre.ethers.utils.formatUnits(
-  //     "100",
-  //     "ether"
-  //   )} of ${tokenOwner}'s tokens...`
-  // );
-  // await mockBnMToken.approve(
-  //   ROUTER_ADDRESS,
-  //   hre.ethers.utils.parseUnits("100", "ether")
-  // );
-  // const allowance = await mockBnMToken.allowance(tokenOwner, ROUTER_ADDRESS);
-
-  // console.log(
-  //   `\n✅ Approved ${ROUTER_ADDRESS} to spend ${hre.ethers.utils.formatUnits(allowance, "ether")} BnM tokens on behalf of ${tokenOwner}`
-  // );
   spinner.stop();
 });

@@ -14,7 +14,7 @@
 2. Run the following Hardhat commands in sequence.
 > **TIP** for  each command you can add the `--help` flag after each command (e.g. `npx hardhat mock-send-message --help`). This will print out the options that the CLI command accepts and the types of data for each option argument.
 
-Note that the setup steps include deploying contracts to your local Hardhat network, those contract addresses are written to `<project-rook>/notes.env` which is gitignored. This is where you can find your contract addresses if you clear your console.
+Note that the setup steps include deploying contracts to your local Hardhat network, those contract addresses are written to `<project-root>/mocks.env` which is gitignored. This is where you can find your contract addresses if you clear your console.
 
 3. In a new terminal window:
 

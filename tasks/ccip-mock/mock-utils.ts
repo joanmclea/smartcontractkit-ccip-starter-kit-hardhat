@@ -6,7 +6,7 @@ import { Client } from "../../typechain-types/IRouterClient";
 import * as ReceiverInterface from "../../typechain-types/artifacts/@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IAny2EVMMessageReceiver";
 
 const EVM_EXTRA_ARGS_V1_TAG = "0x97a657c9";
-const NOTES_PATH = path.resolve(__dirname, "../../", "notes.env");
+const NOTES_PATH = path.resolve(__dirname, "../../", "mocks.env");
 
 export function buildEVM2AnyMessage(
   message?: Partial<Client.EVM2AnyMessageStruct>
@@ -45,7 +45,7 @@ function buildAny2EvmMessage(): ReceiverInterface.Client.Any2EVMMessageStruct {
 }
 
 /**
- * @notice This function reads the notes.env file returns the data as JSON.
+ * @notice This function reads the mocks.env file returns the data as JSON.
  * The data in notes.env must be in JSON format.
  * @returns {any} JSON object
  */
@@ -70,7 +70,7 @@ export function readNotesDoc(): any {
 
 // typescript function that takes in an object with a key of string and values of string
 /**
- * @notice This function writes the data to the notes.env file.
+ * @notice This function writes the data to the mocks.env file.
  * @param {any} JSON data
  */
 export function writeNotesDoc(data: { [key: string]: string }): void {
