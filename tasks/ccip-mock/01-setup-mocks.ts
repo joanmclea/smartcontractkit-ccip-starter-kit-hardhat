@@ -7,7 +7,11 @@ import {
   MockBnMToken,
 } from "../../typechain-types";
 import { Spinner } from "../../utils/spinner";
-import { writeNotesDoc } from "./mock-utils";
+import { writeMocksDoc } from "./mock-utils";
+
+const MOCK_BnM_NAME = "MockBnMToken";
+const ROUTER_NAME = "MockCCIPRouter";
+
 
 let ROUTER_ADDRESS: string;
 let BNM_ADDRESS: string;
@@ -22,6 +26,8 @@ task(
     );
   }
 
+  await hre.run("compile")
+
   // Subtasks at bottom of file.
   await hre.run("mock-deploy-router");
   await hre.run("mock-deploy-bnmtoken");
@@ -32,7 +38,7 @@ task(
     );
   }
 
-  writeNotesDoc({
+  writeMocksDoc({
     router: ROUTER_ADDRESS,
     bnmToken: BNM_ADDRESS,
   });
@@ -41,7 +47,6 @@ task(
 subtask("mock-deploy-router", "Deploys the Mock CCIP Router ").setAction(
   async (_: TaskArguments, hre: HardhatRuntimeEnvironment) => {
     const spinner: Spinner = new Spinner();
-    const ROUTER_NAME = "MockCCIPRouter";
 
     console.log(
       `\n1️⃣  Deploying the ${ROUTER_NAME} Contract to the ${hre.network.name} development chain locally.`
@@ -54,7 +59,7 @@ subtask("mock-deploy-router", "Deploys the Mock CCIP Router ").setAction(
     const mockCCIPRouter: MockCCIPRouter = await mockCCIPRouterFactory.deploy();
     await mockCCIPRouter.deployed();
 
-    const deployer = await mockCCIPRouter.test_owner();
+    const [deployer] = await hre.ethers.getSigners();
 
     ROUTER_ADDRESS = mockCCIPRouter.address;
     console.log(
@@ -72,7 +77,6 @@ subtask(
   console.log(
     "\n2️⃣  Deploying the Mock Burn&Mint ERC20 Token for CCIP transfers..."
   );
-  const MOCK_BnM_NAME = "MockBnMToken";
 
   const mockBnMContractFactory: MockBnMToken__factory =
     await hre.ethers.getContractFactory(MOCK_BnM_NAME);
@@ -86,7 +90,7 @@ subtask(
     `\n✅ ${MOCK_BnM_NAME} deployed at address ${BNM_ADDRESS} on ${hre.network.name} blockchain. Owner is ${tokenOwner}`
   );
 
-  // grant deployer minter and burner permission.
+  // grant deployer minter and burner permission. Send deployer BnM tokens.
   await mockBnMToken.grantMintAndBurnRoles(tokenOwner);
   const startingBal = await mockBnMToken.balanceOf(tokenOwner);
   

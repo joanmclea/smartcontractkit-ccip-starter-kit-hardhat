@@ -1,13 +1,15 @@
 import { task } from "hardhat/config";
-import { HardhatRuntimeEnvironment, TaskArguments } from "hardhat/types";
-import { Spinner } from "../../utils/spinner";
+import { HardhatRuntimeEnvironment ,TaskArguments,  } from "hardhat/types";
 import {
   BasicMessageSender__factory,
   BasicMessageReceiver__factory,
+  ProgrammableTokenTransfers,
+  ProgrammableTokenTransfers__factory,
   CCIPReceiver__factory,
   Client__factory,
 } from "../../typechain-types";
-import { writeNotesDoc } from "./mock-utils";
+import { writeMocksDoc } from "./mock-utils";
+import { Spinner } from "../../utils/spinner";
 
 task(`mock-deploy-client`, `Deploys your sender smart contract to localhost`)
   .addParam(
@@ -23,10 +25,10 @@ task(`mock-deploy-client`, `Deploys your sender smart contract to localhost`)
           `This task can only be run on a local hardhat node running on "localhost". Current network is '${hre.network.name}'.`
         );
       }
-      const routerAddress = taskArguments.mockrouter;
-      const LINK_ZERO_ADDRESS = hre.ethers.constants.AddressZero;
-      const contractName = taskArguments.contractName;
-      const contractType = taskArguments.contractType;
+      const routerAddress:string = taskArguments.mockrouter;
+      const LINK_ZERO_ADDRESS:string = hre.ethers.constants.AddressZero;
+      const contractName:string = taskArguments.contractName;
+      const contractType:string = taskArguments.contractType;
       const [deployer] = await hre.ethers.getSigners();
 
       const spinner: Spinner = new Spinner();
@@ -51,7 +53,7 @@ task(`mock-deploy-client`, `Deploys your sender smart contract to localhost`)
       }
       await contract.deployed();
 
-      writeNotesDoc({[contractType]: contract.address});
+      writeMocksDoc({[contractType]: contract.address});
 
       spinner.stop();
       console.log(

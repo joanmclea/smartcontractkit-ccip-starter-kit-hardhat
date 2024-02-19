@@ -57,13 +57,15 @@ task(
       feeTokenAddress,
       gasLimit,
     } = taskArguments;
+
     let privateKey,
       provider,
       sourceRpcProviderUrl,
+      startingBal,
       usingMock = false;
 
     if (
-      sourceBlockchain === "hardhat" &&
+      sourceBlockchain === "localhost" &&
       sourceBlockchain === destinationBlockchain
     ) {
       console.log("\nℹ️ Setting up to run mocks on local devnet...");
@@ -101,6 +103,7 @@ task(
       routerAddress,
       signer
     );
+
     const supportedTokens = await router.getSupportedTokens(
       targetChainSelector
     );
@@ -125,6 +128,12 @@ task(
 
     const tokenToSend: IERC20 = IERC20__factory.connect(tokenAddress, signer);
 
+    // tokenToSend will only be the same as received token address 
+    // when using the mock as both run on the same local devnet. 
+    if (usingMock) { 
+      startingBal = await tokenToSend.balanceOf(receiver);
+    }
+
     console.log(
       `ℹ️  Attempting to approve Router smart contract (${routerAddress}) to spend ${amount} of ${tokenAddress} tokens on behalf of ${signer.address}`
     );
@@ -132,7 +141,6 @@ task(
 
     const approvalTx = await tokenToSend.approve(routerAddress, amount);
     await approvalTx.wait();
-
 
     spinner.stop();
     console.log(
@@ -199,7 +207,7 @@ task(
       );
 
       console.log(
-        `ℹ️  Attempting to send ${amount} of ${tokenAddress} tokens from the ${sourceBlockchain} blockchain to ${receiver} address on the ${destinationBlockchain} blockchain`
+        `ℹ️  Attempting to send ${amount} tokens from the Router contract ${routerAddress} ${receiver} address on the ${destinationBlockchain} blockchain`
       );
       spinner.start();
 
@@ -230,11 +238,12 @@ task(
       await getCcipMessageId(sendTx, receipt, provider);
     }
 
-    if(usingMock) { 
+    if (usingMock) {
       const updatedBal = await tokenToSend.balanceOf(receiver);
-      console.log(`\nℹ️ Receiver's ${receiver} updated balance is ${updatedBal}`)
+      console.log(
+        `\nℹ️ Receiver's ${receiver}  balance updated from ${startingBal} to ${updatedBal} units of MockBnMToken on ${destinationBlockchain} blockchain`
+      );
     }
-
 
     console.log(`✅ Task ccip-token-transfer finished with the execution`);
   });

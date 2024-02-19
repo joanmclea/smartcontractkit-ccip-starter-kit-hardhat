@@ -90,10 +90,11 @@ export interface MockCCIPRouterInterface extends utils.Interface {
     "GAS_FOR_CALL_EXACT_CHECK()": FunctionFragment;
     "ccipSend(uint64,(bytes,bytes,(address,uint256)[],address,bytes))": FunctionFragment;
     "getFee(uint64,(bytes,bytes,(address,uint256)[],address,bytes))": FunctionFragment;
+    "getOnRamp(uint64)": FunctionFragment;
     "getSupportedTokens(uint64)": FunctionFragment;
     "isChainSupported(uint64)": FunctionFragment;
+    "isOffRamp(uint64,address)": FunctionFragment;
     "routeMessage((bytes32,uint64,bytes,bytes,(address,uint256)[]),uint16,uint256,address)": FunctionFragment;
-    "test_owner()": FunctionFragment;
   };
 
   getFunction(
@@ -102,10 +103,11 @@ export interface MockCCIPRouterInterface extends utils.Interface {
       | "GAS_FOR_CALL_EXACT_CHECK"
       | "ccipSend"
       | "getFee"
+      | "getOnRamp"
       | "getSupportedTokens"
       | "isChainSupported"
+      | "isOffRamp"
       | "routeMessage"
-      | "test_owner"
   ): FunctionFragment;
 
   encodeFunctionData(
@@ -125,12 +127,20 @@ export interface MockCCIPRouterInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>, Client.EVM2AnyMessageStruct]
   ): string;
   encodeFunctionData(
+    functionFragment: "getOnRamp",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getSupportedTokens",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "isChainSupported",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isOffRamp",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "routeMessage",
@@ -140,10 +150,6 @@ export interface MockCCIPRouterInterface extends utils.Interface {
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<string>
     ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "test_owner",
-    values?: undefined
   ): string;
 
   decodeFunctionResult(
@@ -156,6 +162,7 @@ export interface MockCCIPRouterInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "ccipSend", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getFee", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getOnRamp", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getSupportedTokens",
     data: BytesLike
@@ -164,11 +171,11 @@ export interface MockCCIPRouterInterface extends utils.Interface {
     functionFragment: "isChainSupported",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "isOffRamp", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "routeMessage",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "test_owner", data: BytesLike): Result;
 
   events: {
     "MessageExecuted(bytes32,uint64,address,bytes32)": EventFragment;
@@ -233,6 +240,11 @@ export interface MockCCIPRouter extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { fee: BigNumber }>;
 
+    getOnRamp(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[string] & { onRampAddress: string }>;
+
     getSupportedTokens(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -243,6 +255,12 @@ export interface MockCCIPRouter extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean] & { supported: boolean }>;
 
+    isOffRamp(
+      arg0: PromiseOrValue<BigNumberish>,
+      arg1: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
     routeMessage(
       message: Client.Any2EVMMessageStruct,
       gasForCallExactCheck: PromiseOrValue<BigNumberish>,
@@ -250,8 +268,6 @@ export interface MockCCIPRouter extends BaseContract {
       receiver: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
-
-    test_owner(overrides?: CallOverrides): Promise<[string]>;
   };
 
   DEFAULT_GAS_LIMIT(overrides?: CallOverrides): Promise<BigNumber>;
@@ -270,6 +286,11 @@ export interface MockCCIPRouter extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  getOnRamp(
+    arg0: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   getSupportedTokens(
     arg0: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -280,6 +301,12 @@ export interface MockCCIPRouter extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  isOffRamp(
+    arg0: PromiseOrValue<BigNumberish>,
+    arg1: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
   routeMessage(
     message: Client.Any2EVMMessageStruct,
     gasForCallExactCheck: PromiseOrValue<BigNumberish>,
@@ -287,8 +314,6 @@ export interface MockCCIPRouter extends BaseContract {
     receiver: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
-
-  test_owner(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
     DEFAULT_GAS_LIMIT(overrides?: CallOverrides): Promise<BigNumber>;
@@ -307,6 +332,11 @@ export interface MockCCIPRouter extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getOnRamp(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     getSupportedTokens(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -314,6 +344,12 @@ export interface MockCCIPRouter extends BaseContract {
 
     isChainSupported(
       arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    isOffRamp(
+      arg0: PromiseOrValue<BigNumberish>,
+      arg1: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -326,12 +362,10 @@ export interface MockCCIPRouter extends BaseContract {
     ): Promise<
       [boolean, string, BigNumber] & {
         success: boolean;
-        retBytes: string;
+        retData: string;
         gasUsed: BigNumber;
       }
     >;
-
-    test_owner(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
@@ -366,6 +400,11 @@ export interface MockCCIPRouter extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getOnRamp(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getSupportedTokens(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -376,6 +415,12 @@ export interface MockCCIPRouter extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    isOffRamp(
+      arg0: PromiseOrValue<BigNumberish>,
+      arg1: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     routeMessage(
       message: Client.Any2EVMMessageStruct,
       gasForCallExactCheck: PromiseOrValue<BigNumberish>,
@@ -383,8 +428,6 @@ export interface MockCCIPRouter extends BaseContract {
       receiver: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
-
-    test_owner(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -406,6 +449,11 @@ export interface MockCCIPRouter extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getOnRamp(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getSupportedTokens(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -416,6 +464,12 @@ export interface MockCCIPRouter extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    isOffRamp(
+      arg0: PromiseOrValue<BigNumberish>,
+      arg1: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     routeMessage(
       message: Client.Any2EVMMessageStruct,
       gasForCallExactCheck: PromiseOrValue<BigNumberish>,
@@ -423,7 +477,5 @@ export interface MockCCIPRouter extends BaseContract {
       receiver: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
-
-    test_owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

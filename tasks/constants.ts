@@ -1,4 +1,4 @@
-import { readNotesDoc } from "./ccip-mock/mock-utils";
+import { readMocksDoc } from "./ccip-mock/mock-utils";
 
 export type AddressMap = { [blockchain: string]: string };
 export type TokenAmounts = { token: string; amount: string };
@@ -112,9 +112,9 @@ export const routerConfig = {
       `0x4200000000000000000000000000000000000006`,
     ],
   },
-  hardhat: {
+  localhost: {
     address: undefined, //  readNotesDoc().router,
-    chainSelector: "",
+    chainSelector: "0",
     feeTokens: "TODO", // @zeuslawyer TODO when mock LINK is added to mock deployment task.
   },
 };

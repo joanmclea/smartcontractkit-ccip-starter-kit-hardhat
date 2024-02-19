@@ -49,7 +49,7 @@ function buildAny2EvmMessage(): ReceiverInterface.Client.Any2EVMMessageStruct {
  * The data in notes.env must be in JSON format.
  * @returns {any} JSON object
  */
-export function readNotesDoc(): any {
+export function readMocksDoc(): any {
   if (fs.existsSync(NOTES_PATH)) {
   } else {
     // Create the file if it doesn't exist
@@ -73,8 +73,23 @@ export function readNotesDoc(): any {
  * @notice This function writes the data to the mocks.env file.
  * @param {any} JSON data
  */
-export function writeNotesDoc(data: { [key: string]: string }): void {
-  let currentContents = readNotesDoc();
+export function writeMocksDoc(data: { [key: string]: string }): void {
+  let currentContents = readMocksDoc();
   let updatedContents = { ...currentContents, ...data };
   return fs.writeFileSync(NOTES_PATH, JSON.stringify(updatedContents, null, 2));
+}
+
+export async function addressIsContract(
+  address: string,
+  network = "localhost"
+): Promise<boolean> {
+  const provider = new ethers.providers.JsonRpcProvider(
+    "http://127.0.0.1:8545"
+  );
+  
+  const code = await provider.getCode(
+    "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"
+  );
+
+  return code !== "0x";
 }

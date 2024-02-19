@@ -49,8 +49,6 @@ task(
         feeTokenAddress: hre.ethers.constants.AddressZero,
       };
 
-      // const builtMessage = buildEVM2AnyMessage(EVM2AnyMessage);
-
       console.log(
         `\nℹ️  Attempting to send the ${message} message from the BasicMessageSender smart contract (${taskArgs.sender}) on the ${hre.network.name} blockchain to the BasiceMessageReceiver smart contract at ${taskArgs.receiver}} on the same blockchain...`
       );
@@ -90,7 +88,7 @@ task(
 
       console.table({
         messageId: lastestMessageIdBytes32,
-        sourceChainSelector: latestSourceChainSelectorBigNum.toNumber(),
+        sourceChainSelector: latestSourceChainSelectorBigNum.toString(),
         sender: senderAddress,
         message: messageString,
       });

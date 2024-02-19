@@ -30,7 +30,7 @@ export const getProviderRpcUrl = (network: string) => {
     case "baseGoerli":
       rpcUrl = process.env.BASE_GOERLI_RPC_URL;
       break;
-    case "hardhat":
+    case "localhost":
       rpcUrl = "http://127.0.0.1:8545";
       break;
     default:
@@ -72,8 +72,8 @@ export const getRouterConfig = (network: string) => {
       return routerConfig.bnbChainTestnet;
     case "baseGoerli":
       return routerConfig.baseGoerli;
-    case "hardhat":
-      return routerConfig.baseGoerli;
+    case "localhost":
+      return routerConfig.localhost;
     default:
       throw new Error("Unknown network: " + network);
   }

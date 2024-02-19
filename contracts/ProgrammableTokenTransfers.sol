@@ -8,6 +8,8 @@ import {CCIPReceiver} from "@chainlink/contracts-ccip/src/v0.8/ccip/applications
 import {IERC20} from "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.0/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.0/contracts/token/ERC20/utils/SafeERC20.sol";
 
+import {console} from "hardhat/console.sol";
+
 /**
  * THIS IS AN EXAMPLE CONTRACT THAT USES HARDCODED VALUES FOR CLARITY.
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
@@ -77,14 +79,23 @@ contract ProgrammableTokenTransfers is CCIPReceiver, OwnerIsCreator {
         address token,
         uint256 amount
     ) external returns (bytes32 messageId) {
-        // set the tokent amounts
-        Client.EVMTokenAmount[]
-            memory tokenAmounts = new Client.EVMTokenAmount[](1);
+        // Initialize a router client instance to interact with cross-chain router
+        IRouterClient router = IRouterClient(this.getRouter());
+
+        // Set the tokent amounts array
         Client.EVMTokenAmount memory tokenAmount = Client.EVMTokenAmount({
             token: token,
             amount: amount
         });
-        tokenAmounts[0] = tokenAmount;
+        Client.EVMTokenAmount[]
+            memory tokenAmounts = new Client.EVMTokenAmount[](1);
+
+        if (token != address(0) && amount > 0) {
+            tokenAmounts[0] = tokenAmount;
+            // approve the Router to spend tokens on contract's behalf. It will spend the amount of the given token
+            IERC20(token).approve(address(router), amount);
+        }
+
         // Create an EVM2AnyMessage struct in memory with necessary information for sending a cross-chain message
         Client.EVM2AnyMessage memory evm2AnyMessage = Client.EVM2AnyMessage({
             receiver: abi.encode(receiver), // ABI-encoded receiver address
@@ -95,12 +106,6 @@ contract ProgrammableTokenTransfers is CCIPReceiver, OwnerIsCreator {
             ),
             feeToken: address(0) // Setting feeToken to zero address, indicating native asset will be used for fees
         });
-
-        // Initialize a router client instance to interact with cross-chain router
-        IRouterClient router = IRouterClient(this.getRouter());
-
-        // approve the Router to spend tokens on contract's behalf. I will spend the amount of the given token
-        IERC20(token).approve(address(router), amount);
 
         // Get the fee required to send the message
         uint256 fees = router.getFee(destinationChainSelector, evm2AnyMessage);

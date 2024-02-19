@@ -45,9 +45,9 @@ contract BasicTokenSender is Withdraw {
         Client.EVMTokenAmount[] memory tokensToSendDetails,
         PayFeesIn payFeesIn
     ) external {
-        uint256 length = tokensToSendDetails.length;
+        uint256 numTokensToSend = tokensToSendDetails.length;
 
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i = 0; i < numTokensToSend; ) {
             IERC20(tokensToSendDetails[i].token).safeTransferFrom(
                 msg.sender,
                 address(this),
