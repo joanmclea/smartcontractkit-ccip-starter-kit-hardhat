@@ -101,13 +101,7 @@ task(
         MESSAGE.transferAmount
       );
 
-      // const sendReceipt = await sendTx.wait();
-
-      // console.log("TODO zeuslawyer remove events log:  ", sendReceipt.events![3].args?.messageId);
-      // const sentMessageId =
-      //   MESSAGE.transferAmount > 0
-      //     ? sendReceipt.events![3].args?.messageId
-      //     : sendReceipt.events![1].args?.messageId;
+      const sendReceipt = await sendTx.wait();
 
       spinner.stop();
 
