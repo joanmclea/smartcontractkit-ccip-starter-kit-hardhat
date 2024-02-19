@@ -82,7 +82,7 @@ task(
       const senderTokenBal = await tokenToSend.balanceOf(taskArgs.sender);
       if (taskArgs.amount > senderTokenBal) {
         console.log(
-          `\nℹ️ 💰 Funding Sender ${taskArgs.sender} with ${taskArgs.amount} units of mockBnM as it has insufficient balance.`
+          `\nℹ️ 💰 Funding Sender contract ${taskArgs.sender} with ${taskArgs.amount} units of mockBnM as it has insufficient balance.`
         );
         await tokenToSend.transfer(taskArgs.sender, taskArgs.amount);
       }
@@ -149,7 +149,7 @@ task(
             `The message received does not match the message sent. Expected: "${taskArgs.message}". Received: "${messageString}"`
           );
         }
-        
+
         if (
           parseInt(transferredAmount.toString()) !== parseInt(taskArgs.amount)
         ) {

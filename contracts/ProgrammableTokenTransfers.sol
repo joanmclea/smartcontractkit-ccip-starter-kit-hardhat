@@ -82,17 +82,15 @@ contract ProgrammableTokenTransfers is CCIPReceiver, OwnerIsCreator {
         // Initialize a router client instance to interact with cross-chain router
         IRouterClient router = IRouterClient(this.getRouter());
 
-        // Set the tokent amounts array
+        Client.EVMTokenAmount[]
+            memory tokenAmounts = new Client.EVMTokenAmount[](1);
         Client.EVMTokenAmount memory tokenAmount = Client.EVMTokenAmount({
             token: token,
             amount: amount
         });
-        Client.EVMTokenAmount[]
-            memory tokenAmounts = new Client.EVMTokenAmount[](0);
+        tokenAmounts[0] = tokenAmount;
 
         if (token != address(0) && amount > 0) {
-            tokenAmounts = new Client.EVMTokenAmount[](1);
-            tokenAmounts[0] = tokenAmount;
             // approve the Router to spend tokens on contract's behalf. It will spend the amount of the given token
             IERC20(token).approve(address(router), amount);
         }
@@ -101,7 +99,9 @@ contract ProgrammableTokenTransfers is CCIPReceiver, OwnerIsCreator {
         Client.EVM2AnyMessage memory evm2AnyMessage = Client.EVM2AnyMessage({
             receiver: abi.encode(receiver), // ABI-encoded receiver address
             data: abi.encode(message), // ABI-encoded string message
-            tokenAmounts: tokenAmounts, // Tokens amounts
+            tokenAmounts: token == address(0)
+                ? new Client.EVMTokenAmount[](0) // emtpy array
+                : tokenAmounts, // token amounts
             extraArgs: Client._argsToBytes(
                 Client.EVMExtraArgsV1({gasLimit: 200_000}) // Additional arguments, setting gas limit and non-strict sequency mode
             ),
