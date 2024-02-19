@@ -88,13 +88,18 @@ contract ProgrammableTokenTransfers is CCIPReceiver, OwnerIsCreator {
             amount: amount
         });
         Client.EVMTokenAmount[]
-            memory tokenAmounts = new Client.EVMTokenAmount[](1);
+            memory tokenAmounts = new Client.EVMTokenAmount[](0);
+
+        console.log("len1", tokenAmounts.length);
 
         if (token != address(0) && amount > 0) {
+            tokenAmounts = new Client.EVMTokenAmount[](1);
             tokenAmounts[0] = tokenAmount;
             // approve the Router to spend tokens on contract's behalf. It will spend the amount of the given token
             IERC20(token).approve(address(router), amount);
         }
+
+        console.log("len2", tokenAmounts.length); // TODO zeuslawyer remove
 
         // Create an EVM2AnyMessage struct in memory with necessary information for sending a cross-chain message
         Client.EVM2AnyMessage memory evm2AnyMessage = Client.EVM2AnyMessage({

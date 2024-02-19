@@ -100,7 +100,15 @@ task(
         MESSAGE.transferToken,
         MESSAGE.transferAmount
       );
-      await sendTx.wait();
+
+      // const sendReceipt = await sendTx.wait();
+
+      // console.log("TODO zeuslawyer remove events log:  ", sendReceipt.events![3].args?.messageId);
+      // const sentMessageId =
+      //   MESSAGE.transferAmount > 0
+      //     ? sendReceipt.events![3].args?.messageId
+      //     : sendReceipt.events![1].args?.messageId;
+
       spinner.stop();
 
       console.log(
@@ -109,7 +117,7 @@ task(
       console.table(MESSAGE);
 
       spinner.start();
-      console.log("\nChecking if message received...");
+      console.log(`\nChecking if message received...`);
 
       if (!DESTINATION_IS_CONTRACT) {
         // TODO @zeuslawyer for when sending to EOA is supported by mock.
@@ -134,10 +142,24 @@ task(
           messageString,
           tokenAddress,
           transferredAmount,
-        ] = await receiverContract.getLastReceivedMessageDetails();
+        ] = await receiverContract.getLastReceivedMessageDetails(); // getReceivedMessageDetails(sentMessageId);
+
+        if (messageString !== taskArgs.message) {
+          throw Error(
+            `The message received does not match the message sent. Expected: "${taskArgs.message}". Received: "${messageString}"`
+          );
+        }
+        
+        if (
+          parseInt(transferredAmount.toString()) !== parseInt(taskArgs.amount)
+        ) {
+          throw Error(
+            `The amount received does not match the amount sent. Expected: "${taskArgs.amount}". Received: "${transferredAmount}"`
+          );
+        }
 
         console.log(
-          `\n✅ Message received in Receiver Contract ${receiverContract.address}. Details: \n`
+          `\n✅ Message received in Receiver Contract ${receiverContract.address}. Details: \n ${sourceChainSelector}, ${transferredAmount}\n`
         );
 
         console.table({

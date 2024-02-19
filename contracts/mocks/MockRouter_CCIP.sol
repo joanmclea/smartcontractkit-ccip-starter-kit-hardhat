@@ -106,16 +106,11 @@ contract MockCCIPRouter is IRouter, IRouterClient {
         });
 
         for (uint256 i = 0; i < message.tokenAmounts.length; ++i) {
-            if ( 
-                message.tokenAmounts[i].token != address(0)
-            ) {
-                // When using the mock, safeTransferFrom to a zero address will revert with "Address: call to non-contract"
-                IERC20(message.tokenAmounts[i].token).safeTransferFrom(
-                    msg.sender,
-                    receiver,
-                    message.tokenAmounts[i].amount
-                );
-            }
+            IERC20(message.tokenAmounts[i].token).safeTransferFrom(
+                msg.sender,
+                receiver,
+                message.tokenAmounts[i].amount
+            );
         }
 
         _routeMessage(
