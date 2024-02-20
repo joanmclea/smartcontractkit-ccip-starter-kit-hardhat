@@ -1,7 +1,7 @@
-import { readMocksDoc } from "./ccip-mock/mock-utils";
+import {readMocksDoc} from "./ccip-mock/mock-utils";
 
-export type AddressMap = { [blockchain: string]: string };
-export type TokenAmounts = { token: string; amount: string };
+export type AddressMap = {[blockchain: string]: string};
+export type TokenAmounts = {token: string; amount: string};
 
 export enum PayFeesIn {
   Native,
@@ -59,61 +59,40 @@ export const routerConfig = {
   ethereumSepolia: {
     address: `0x0BF3dE8c5D3e8A2B34D2BEeB17ABfCeBaf363A59`,
     chainSelector: `16015286601757825753`,
-    feeTokens: [
-      LINK_ADDRESSES[`ethereumSepolia`],
-      `0x097D90c9d3E0B50Ca60e1ae45F6A81010f9FB534`,
-    ],
+    feeTokens: [LINK_ADDRESSES[`ethereumSepolia`], `0x097D90c9d3E0B50Ca60e1ae45F6A81010f9FB534`],
   },
   optimismGoerli: {
     address: `0xcc5a0B910D9E9504A7561934bed294c51285a78D`,
     chainSelector: `2664363617261496610`,
-    feeTokens: [
-      LINK_ADDRESSES[`optimismGoerli`],
-      `0x4200000000000000000000000000000000000006`,
-    ],
+    feeTokens: [LINK_ADDRESSES[`optimismGoerli`], `0x4200000000000000000000000000000000000006`],
   },
   avalancheFuji: {
     address: `0xF694E193200268f9a4868e4Aa017A0118C9a8177`,
     chainSelector: `14767482510784806043`,
-    feeTokens: [
-      LINK_ADDRESSES[`avalancheFuji`],
-      `0xd00ae08403B9bbb9124bB305C09058E32C39A48c`,
-    ],
+    feeTokens: [LINK_ADDRESSES[`avalancheFuji`], `0xd00ae08403B9bbb9124bB305C09058E32C39A48c`],
   },
   arbitrumSepolia: {
     address: `0x2a9C5afB0d0e4BAb2BCdaE109EC4b0c4Be15a165`,
     chainSelector: `3478487238524512106`,
-    feeTokens: [
-      LINK_ADDRESSES[`arbitrumSepolia`],
-      `0xE591bf0A0CF924A0674d7792db046B23CEbF5f34`,
-    ],
+    feeTokens: [LINK_ADDRESSES[`arbitrumSepolia`], `0xE591bf0A0CF924A0674d7792db046B23CEbF5f34`],
   },
   polygonMumbai: {
     address: `0x1035CabC275068e0F4b745A29CEDf38E13aF41b1`,
     chainSelector: `12532609583862916517`,
-    feeTokens: [
-      LINK_ADDRESSES[`polygonMumbai`],
-      `0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889`,
-    ],
+    feeTokens: [LINK_ADDRESSES[`polygonMumbai`], `0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889`],
   },
   bnbChainTestnet: {
     address: `0xE1053aE1857476f36A3C62580FF9b016E8EE8F6f`,
     chainSelector: `13264668187771770619`,
-    feeTokens: [
-      LINK_ADDRESSES[`bnbChainTestnet`],
-      `0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd`,
-    ],
+    feeTokens: [LINK_ADDRESSES[`bnbChainTestnet`], `0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd`],
   },
   baseGoerli: {
     address: `0x80AF2F44ed0469018922c9F483dc5A909862fdc2`,
     chainSelector: `5790810961207155433`,
-    feeTokens: [
-      LINK_ADDRESSES[`baseGoerli`],
-      `0x4200000000000000000000000000000000000006`,
-    ],
+    feeTokens: [LINK_ADDRESSES[`baseGoerli`], `0x4200000000000000000000000000000000000006`],
   },
   localhost: {
-    address: undefined, //  readNotesDoc().router,
+    address: readMocksDoc().router,
     chainSelector: "0",
     feeTokens: "TODO", // @zeuslawyer TODO when mock LINK is added to mock deployment task.
   },

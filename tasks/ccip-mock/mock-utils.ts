@@ -1,20 +1,18 @@
-import { ethers } from "ethers";
+import {ethers} from "ethers";
 import fs from "fs";
 import path from "path";
+import {getProviderRpcUrl} from "../utils";
 
-import { Client } from "../../typechain-types/IRouterClient";
+import {Client} from "../../typechain-types/IRouterClient";
 import * as ReceiverInterface from "../../typechain-types/artifacts/@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IAny2EVMMessageReceiver";
 
 const EVM_EXTRA_ARGS_V1_TAG = "0x97a657c9";
 const NOTES_PATH = path.resolve(__dirname, "../../", "mocks.env");
 
-export function buildEVM2AnyMessage(
-  message?: Partial<Client.EVM2AnyMessageStruct>
-): Client.EVM2AnyMessageStruct {
+export function buildEVM2AnyMessage(message?: Partial<Client.EVM2AnyMessageStruct>): Client.EVM2AnyMessageStruct {
   const abiCoder = ethers.utils.defaultAbiCoder;
   const ADDRESS_ZERO = ethers.constants.AddressZero;
-  const receiver =
-    message?.receiver || abiCoder.encode(["address"], [ADDRESS_ZERO]);
+  const receiver = message?.receiver || abiCoder.encode(["address"], [ADDRESS_ZERO]);
   const data = message?.data || abiCoder.encode(["string"], ["Hello World"]);
   const tokenAmounts = message?.tokenAmounts || [
     {
@@ -60,9 +58,7 @@ export function readMocksDoc(): any {
   let fileDataStr: string = fs.readFileSync(NOTES_PATH).toString();
 
   if (fileDataStr.length === 0) {
-    console.log(
-      "\n⚠️  notes.env file is empty. File expected to contain JSON data...."
-    );
+    console.log("\n⚠️  notes.env file is empty. File expected to contain JSON data....");
     return;
   }
   return JSON.parse(fileDataStr);
@@ -73,23 +69,16 @@ export function readMocksDoc(): any {
  * @notice This function writes the data to the mocks.env file.
  * @param {any} JSON data
  */
-export function writeMocksDoc(data: { [key: string]: string }): void {
+export function writeMocksDoc(data: {[key: string]: string}): void {
   let currentContents = readMocksDoc();
-  let updatedContents = { ...currentContents, ...data };
+  let updatedContents = {...currentContents, ...data};
   return fs.writeFileSync(NOTES_PATH, JSON.stringify(updatedContents, null, 2));
 }
 
-export async function addressIsContract(
-  address: string,
-  network = "localhost"
-): Promise<boolean> {
-  const provider = new ethers.providers.JsonRpcProvider(
-    "http://127.0.0.1:8545"
-  );
-  
-  const code = await provider.getCode(
-    "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"
-  );
+export async function addressIsContract(address: string, network = "localhost"): Promise<boolean> {
+  const provider = new ethers.providers.JsonRpcProvider(getProviderRpcUrl(network));
+  console.log(provider.connection.url);
+  const code = await provider.getCode(address);
 
   return code !== "0x";
 }
