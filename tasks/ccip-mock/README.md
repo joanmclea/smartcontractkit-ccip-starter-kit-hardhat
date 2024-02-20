@@ -31,7 +31,7 @@ Note that the setup steps include deploying contracts to your local Hardhat netw
 
 # Using Existing Tasks Outside the `../ccip-mock` folder
 
-## Tokens from EOA to EOA  ❌
+## Tokens from EOA to EOA  ✅
 This uses the task at `../../tasks/ccip-token-transfer.ts`
 ```
 npx hardhat ccip-token-transfer \

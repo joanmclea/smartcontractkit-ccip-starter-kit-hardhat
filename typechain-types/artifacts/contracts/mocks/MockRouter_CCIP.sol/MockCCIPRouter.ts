@@ -179,9 +179,11 @@ export interface MockCCIPRouterInterface extends utils.Interface {
 
   events: {
     "MessageExecuted(bytes32,uint64,address,bytes32)": EventFragment;
+    "MsgExecuted(bool,bytes,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "MessageExecuted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MsgExecuted"): EventFragment;
 }
 
 export interface MessageExecutedEventObject {
@@ -196,6 +198,18 @@ export type MessageExecutedEvent = TypedEvent<
 >;
 
 export type MessageExecutedEventFilter = TypedEventFilter<MessageExecutedEvent>;
+
+export interface MsgExecutedEventObject {
+  success: boolean;
+  retData: string;
+  gasUsed: BigNumber;
+}
+export type MsgExecutedEvent = TypedEvent<
+  [boolean, string, BigNumber],
+  MsgExecutedEventObject
+>;
+
+export type MsgExecutedEventFilter = TypedEventFilter<MsgExecutedEvent>;
 
 export interface MockCCIPRouter extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -381,6 +395,17 @@ export interface MockCCIPRouter extends BaseContract {
       offRamp?: null,
       calldataHash?: null
     ): MessageExecutedEventFilter;
+
+    "MsgExecuted(bool,bytes,uint256)"(
+      success?: null,
+      retData?: null,
+      gasUsed?: null
+    ): MsgExecutedEventFilter;
+    MsgExecuted(
+      success?: null,
+      retData?: null,
+      gasUsed?: null
+    ): MsgExecutedEventFilter;
   };
 
   estimateGas: {
