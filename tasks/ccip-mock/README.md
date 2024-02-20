@@ -1,8 +1,7 @@
 # TODOs
 
-1. Deploy mock LINK to pay fees with
-2. should mock BnM be configed to send 20 tokens to senderContract as part of setup?
-3. should send tokens to receiver?
+1. Tests on the mock
+2. mock Link and mock paying fee with LINK
 
 # Using Tasks inside the `../ccip-mock` directory
 
