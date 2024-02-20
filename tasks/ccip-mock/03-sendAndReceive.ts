@@ -44,7 +44,7 @@ task(`mock-send-receive`, `sends message to CCIP receiver on your local dev chai
     const [deployer] = await hre.ethers.getSigners();
     const message = "Hello CCIP";
     const tokenToSend: IERC20 = IERC20__factory.connect(taskArgs.tokenAddress, deployer);
-    const DESTINATION_IS_CONTRACT = addressIsContract(taskArgs.receiver);
+    const DESTINATION_IS_CONTRACT = await addressIsContract(taskArgs.receiver);
 
     const senderContract: ProgrammableTokenTransfers = ProgrammableTokenTransfers__factory.connect(
       taskArgs.sender,
@@ -84,10 +84,9 @@ task(`mock-send-receive`, `sends message to CCIP receiver on your local dev chai
     );
 
     const sendReceipt = await sendTx.wait();
-
     spinner.stop();
 
-    console.log(`\n✅ Message sent, transaction hash: ${sendTx.hash}. Message Details: \n`);
+    console.log(`\n✅ Message sent, transaction hash: ${sendTx.hash}. \nMessage Details: \n`);
     console.table(MESSAGE);
 
     spinner.start();
