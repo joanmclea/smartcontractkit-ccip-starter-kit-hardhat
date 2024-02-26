@@ -75,6 +75,7 @@ contract MockCCIPRouter is IRouter, IRouterClient {
     Client.EVM2AnyMessage calldata message
   ) external payable returns (bytes32) {
     if (message.receiver.length != 32) revert InvalidAddress(message.receiver);
+
     uint256 decodedReceiver = abi.decode(message.receiver, (uint256));
     // We want to disallow sending to address(0) and to precompiles, which exist on address(1) through address(9).
     if (decodedReceiver > type(uint160).max || decodedReceiver < 10) revert InvalidAddress(message.receiver);

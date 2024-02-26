@@ -73,7 +73,7 @@ subtask("mock-deploy-bnmtoken", "Deploy the Mock BnM ERC20 Token and grant permi
       `\n✅ ${MOCK_BnM_NAME} deployed at address ${BNM_ADDRESS} on ${hre.network.name} blockchain. Owner is ${tokenOwner}`
     );
 
-    // grant deployer minter and burner permission. Send deployer BnM tokens.
+    // grant deployer minter and burner permission. Send BnM tokens to deployer.
     await mockBnMToken.grantMintAndBurnRoles(tokenOwner);
     const startingBal = await mockBnMToken.balanceOf(tokenOwner);
 

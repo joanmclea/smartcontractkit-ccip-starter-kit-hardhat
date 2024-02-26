@@ -6,28 +6,45 @@ import {getProviderRpcUrl} from "../utils";
 import {Client} from "../../typechain-types/IRouterClient";
 import * as ReceiverInterface from "../../typechain-types/artifacts/@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IAny2EVMMessageReceiver";
 
-const EVM_EXTRA_ARGS_V1_TAG = "0x97a657c9";
+const EVM_EXTRA_ARGS_V1_TAG_FUNCTION_SELECTOR = "0x97a657c9"; // 4bytes. See CCIP Client.sol
 const NOTES_PATH = path.resolve(__dirname, "../../", "mocks.env");
 
-export function buildEVM2AnyMessage(message?: Partial<Client.EVM2AnyMessageStruct>): Client.EVM2AnyMessageStruct {
+type MessageContents = {
+  receiver: string;
+  data: string | undefined;
+  tokenAmounts: {token: string; amount: string}[] | undefined;
+  feeToken: string | undefined;
+};
+export function buildEVM2AnyMessage(message?: MessageContents): Client.EVM2AnyMessageStruct {
   const abiCoder = ethers.utils.defaultAbiCoder;
   const ADDRESS_ZERO = ethers.constants.AddressZero;
-  const receiver = message?.receiver || abiCoder.encode(["address"], [ADDRESS_ZERO]);
-  const data = message?.data || abiCoder.encode(["string"], ["Hello World"]);
-  const tokenAmounts = message?.tokenAmounts || [
-    {
-      token: ADDRESS_ZERO,
-      amount: "100",
-    },
-  ];
+
+  const receiver = message?.receiver
+    ? abiCoder.encode(["address"], [message.receiver])
+    : abiCoder.encode(["address"], [ADDRESS_ZERO]);
+  const data = message?.data ? abiCoder.encode(["string"], [message.data]) : "0x";
+
+  const tokenAmounts = message?.tokenAmounts?.length
+    ? message?.tokenAmounts
+    : [
+        {
+          token: ADDRESS_ZERO,
+          amount: 0,
+        },
+      ];
   const feeToken = message?.feeToken || ADDRESS_ZERO;
-  const extraArgs = message?.extraArgs || EVM_EXTRA_ARGS_V1_TAG;
+
+  const gasLimit = message?.data ? 200_000 : 0; // defaults to gas limit 0, on assumption that not sending  data
+  const extraArgs = abiCoder.encode(["uint256"], [gasLimit]);
+
+  const taggedEncodedExtraArgs = EVM_EXTRA_ARGS_V1_TAG_FUNCTION_SELECTOR + extraArgs.slice(2);
+
   return {
     receiver,
     data,
     tokenAmounts,
     feeToken,
-    extraArgs,
+    extraArgs: taggedEncodedExtraArgs,
   };
 }
 
