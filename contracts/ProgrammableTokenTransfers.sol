@@ -75,7 +75,7 @@ contract ProgrammableTokenTransfers is CCIPReceiver, OwnerIsCreator {
   function sendMessage(
     uint64 destinationChainSelector,
     address receiver,
-    string calldata message,
+    string calldata message, // TODO @zeuslawyerc change to bytes so that we can send empty bytes as message where destination is EOA. Right now we are forced into sending "" here.
     address token,
     uint256 amount
   ) external returns (bytes32 messageId) {
@@ -123,14 +123,25 @@ contract ProgrammableTokenTransfers is CCIPReceiver, OwnerIsCreator {
     uint64 sourceChainSelector = any2EvmMessage.sourceChainSelector; // fetch the source chain identifier (aka selector)
     address sender = abi.decode(any2EvmMessage.sender, (address)); // abi-decoding of the sender address
     Client.EVMTokenAmount[] memory tokenAmounts = any2EvmMessage.destTokenAmounts;
-    address token = tokenAmounts[0].token; // we expect one token to be transfered at once but of course, you can transfer several tokens.
-    uint256 amount = tokenAmounts[0].amount; // we expect one token to be transfered at once but of course, you can transfer several tokens.
-    string memory message = abi.decode(any2EvmMessage.data, (string)); // abi-decoding of the sent string message
+
+    address token;
+    uint256 amount;
+
+    if (tokenAmounts.length > 0) {
+      token = tokenAmounts[0].token; // we expect one token to be transfered at once but of course, you can transfer several tokens.
+      amount = tokenAmounts[0].amount; // we expect one token to be transfered at once but of course, you can transfer several tokens.
+    }
+
+    string memory message; // default value is ""
+    if (any2EvmMessage.data.length > 0) {
+      message = abi.decode(any2EvmMessage.data, (string)); // abi-decoding of the sent string message if it exists.
+    }
+
     receivedMessages.push(messageId);
     Message memory detail = Message(sourceChainSelector, sender, message, token, amount);
     messageDetail[messageId] = detail;
 
-    emit MessageReceived(messageId, sourceChainSelector, sender, message, tokenAmounts[0]);
+    emit MessageReceived(messageId, sourceChainSelector, sender, message, Client.EVMTokenAmount(token, amount));
   }
 
   /// @notice Get the total number of received messages.

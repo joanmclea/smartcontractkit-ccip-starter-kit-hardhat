@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "hardhat/console.sol";
+
 /// @notice This library contains various callWithExactGas functions. All of them are
 /// safe from gas bomb attacks.
 /// @dev There is code duplication in this library. This is done to not leave the assembly
@@ -124,6 +126,7 @@ library CallWithExactGas {
       // copy the bytes from retData[0:_toCopy]
       returndatacopy(add(retData, 0x20), 0x0, toCopy)
     }
+
     return (success, retData, gasUsed);
   }
 

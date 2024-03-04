@@ -11,18 +11,23 @@ const NOTES_PATH = path.resolve(__dirname, "../../", "mocks.env");
 
 type MessageContents = {
   receiver: string;
-  data: string | undefined;
+  data: string | ethers.utils.BytesLike;
   tokenAmounts: {token: string; amount: string}[] | undefined;
   feeToken: string | undefined;
 };
-export function buildEVM2AnyMessage(message?: MessageContents): Client.EVM2AnyMessageStruct {
+export function buildEVM2AnyMessage(message: MessageContents): Client.EVM2AnyMessageStruct {
   const abiCoder = ethers.utils.defaultAbiCoder;
   const ADDRESS_ZERO = ethers.constants.AddressZero;
 
   const receiver = message?.receiver
     ? abiCoder.encode(["address"], [message.receiver])
     : abiCoder.encode(["address"], [ADDRESS_ZERO]);
-  const data = message?.data ? abiCoder.encode(["string"], [message.data]) : "0x";
+
+  const data =
+    message.data && message.data != ""
+      ? abiCoder.encode(["string"], [message.data])
+      : // Programmable Token Transfer contract expects string not bytes in ccipSend()
+        abiCoder.encode(["string"], [""]);
 
   const tokenAmounts = message?.tokenAmounts?.length
     ? message?.tokenAmounts
@@ -32,9 +37,9 @@ export function buildEVM2AnyMessage(message?: MessageContents): Client.EVM2AnyMe
           amount: 0,
         },
       ];
-  const feeToken = message?.feeToken || ADDRESS_ZERO;
+  const feeToken = message.feeToken || ADDRESS_ZERO;
 
-  const gasLimit = message?.data ? 200_000 : 0; // defaults to gas limit 0, on assumption that not sending  data
+  const gasLimit = message.data ? 200_000 : 0; // defaults to gas limit 0, on assumption that not sending  data
   const extraArgs = abiCoder.encode(["uint256"], [gasLimit]);
 
   const taggedEncodedExtraArgs = EVM_EXTRA_ARGS_V1_TAG_FUNCTION_SELECTOR + extraArgs.slice(2);

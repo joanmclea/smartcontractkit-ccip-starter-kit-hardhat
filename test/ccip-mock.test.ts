@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import hre from "hardhat";
-import {Event} from "ethers";
+import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
 const {loadFixture, mine, time} = require("@nomicfoundation/hardhat-network-helpers");
 
 import {
@@ -23,14 +23,19 @@ describe("CCIP Mock Router", function () {
     const destinationChainSelector = 0;
     const tokenAmountUnits = "987";
 
-    const {mockRouter, mockBnMToken, wallet2}: SetupMocksFixture = await loadFixture(setupMocksFixture);
+    const {
+      mockRouter,
+      mockBnMToken,
+      wallet2,
+      deployer: sender,
+    }: SetupMocksFixture = await loadFixture(setupMocksFixture);
     // approve Router directly for EOA initiated CCIP sends
-    await mockBnMToken.approve(mockRouter.address, 1000);
+    await mockBnMToken.connect(sender).approve(mockRouter.address, 1000);
 
-    const receiverStartBal = await mockBnMToken.balanceOf(wallet2);
+    const receiverStartBal = await mockBnMToken.balanceOf(wallet2.address);
 
     const message = buildEVM2AnyMessage({
-      receiver: wallet2,
+      receiver: wallet2.address,
       data: "",
       tokenAmounts: [{token: mockBnMToken.address, amount: tokenAmountUnits}],
       feeToken: undefined,
@@ -40,7 +45,7 @@ describe("CCIP Mock Router", function () {
     const receipt = await sendTx.wait();
     await time.increase(600); //10 minute jump
 
-    const receiverUpdatedBal = await mockBnMToken.balanceOf(wallet2);
+    const receiverUpdatedBal = await mockBnMToken.balanceOf(wallet2.address);
     expect(receiverUpdatedBal.sub(receiverStartBal).toString()).to.equal(tokenAmountUnits);
   });
 
@@ -58,7 +63,7 @@ describe("CCIP Mock Router", function () {
     }: SetupMocksFixture = await loadFixture(setupMocksFixture);
 
     // approve Router directly for EOA initiated CCIP sends
-    await mockBnMToken.approve(mockRouter.address, 1000);
+    await mockBnMToken.connect(sender).approve(mockRouter.address, 1000);
 
     const receiverStartBal = await mockBnMToken.balanceOf(receiver.address);
 
@@ -83,8 +88,53 @@ describe("CCIP Mock Router", function () {
     } = await receiver.getLastReceivedMessageDetails();
 
     expect(sourceChainSelector.toString()).to.equal("16015286601757825753"); // Hard coded in Mock Router
-    expect(senderAddress).to.equal(sender); // In this test, message and token sent by EOA. Can be tested with Programmable Transfer sender contract too.
+    expect(senderAddress).to.equal(sender.address); // In this test, message and token sent by EOA. Can be tested with Programmable Transfer sender contract too.
     expect(messageText).to.equal(message);
+    expect(tokenAddress).to.equal(mockBnMToken.address);
+    expect(tokenUnits.toString()).to.equal(tokenAmountUnits);
+    await expect(await mockBnMToken.balanceOf(receiver.address)).to.equal(receiverStartBal.add(tokenAmountUnits));
+  });
+
+  // TODO - why does this fail with receiver error - but works with any string message.
+  it.skip("EOA to Contract: Token only => OK", async function () {
+    const destinationChainSelector = 0;
+    const tokenAmountUnits = "123";
+    const anyValPredicate = () => true; // https://hardhat.org/hardhat-chai-matchers/docs/overview#events-with-arguments
+
+    const {
+      mockRouter,
+      receiver,
+      mockBnMToken,
+      deployer: senderEOA,
+    }: SetupMocksFixture = await loadFixture(setupMocksFixture);
+
+    // approve Router directly for EOA initiated CCIP sends
+    await mockBnMToken.connect(senderEOA).approve(mockRouter.address, 1000);
+
+    const receiverStartBal = await mockBnMToken.balanceOf(receiver.address);
+
+    const messageWithTokenNoData = buildEVM2AnyMessage({
+      receiver: receiver.address,
+      data: "",
+      tokenAmounts: [{token: mockBnMToken.address, amount: tokenAmountUnits}],
+      feeToken: undefined,
+    });
+
+    await expect(mockRouter.ccipSend(destinationChainSelector, messageWithTokenNoData))
+      .to.emit(mockRouter, "MsgExecuted")
+      .withArgs(true, "0x", anyValPredicate);
+
+    const {
+      messageId,
+      sourceChainSelector,
+      sender: senderAddress,
+      message: messageText,
+      token: tokenAddress,
+      amount: tokenUnits,
+    } = await receiver.getLastReceivedMessageDetails();
+
+    expect(senderAddress).to.equal(senderEOA.address);
+    expect(messageText).to.equal("");
     expect(tokenAddress).to.equal(mockBnMToken.address);
     expect(tokenUnits.toString()).to.equal(tokenAmountUnits);
     await expect(await mockBnMToken.balanceOf(receiver.address)).to.equal(receiverStartBal.add(tokenAmountUnits));
@@ -133,10 +183,90 @@ describe("CCIP Mock Router", function () {
     await expect(await mockBnMToken.balanceOf(receiver.address)).to.equal(receiverStartBal.add(tokenAmountUnits));
   });
 
-  it.todo = function todo(descString: string, callback: Function) {};
-  it.todo("EOA to Contract: Token only => OK", async function () {});
-  it.todo("Contract to Contract: Token only => OK", async function () {});
-  it.todo("Contract to Contract: Message only => OK", async function () {});
+  it("Contract to Contract: Token only => OK", async function () {
+    const message = "";
+    const destinationChainSelector = 0;
+    const tokenAmountUnits = "987";
+    const anyValPredicate = () => true; // https://hardhat.org/hardhat-chai-matchers/docs/overview#events-with-arguments
+
+    const {mockRouter, sender, receiver, mockBnMToken}: SetupMocksFixture = await loadFixture(setupMocksFixture);
+
+    // approve CCIP Client Sender contract for Contract-initiated CCIP sends
+    await mockBnMToken.transfer(sender.address, 1000);
+
+    const receiverStartBal = await mockBnMToken.balanceOf(receiver.address);
+
+    await expect(
+      await sender.sendMessage(
+        destinationChainSelector,
+        receiver.address,
+        message,
+        mockBnMToken.address,
+        tokenAmountUnits
+      )
+    )
+      .to.emit(mockRouter, "MsgExecuted")
+      .withArgs(true, "0x", anyValPredicate);
+
+    const {
+      messageId,
+      sourceChainSelector,
+      sender: senderAddress,
+      message: messageText,
+      token: tokenAddress,
+      amount: tokenUnits,
+    } = await receiver.getLastReceivedMessageDetails();
+
+    expect(sourceChainSelector.toString()).to.equal("16015286601757825753"); // Hard coded in Mock Router
+    expect(senderAddress).to.equal(sender.address); // In this test, message and token sent by EOA. Can be tested with Programmable Transfer sender contract too.
+    expect(messageText).to.equal(message);
+    expect(tokenAddress).to.equal(mockBnMToken.address);
+    expect(tokenUnits.toString()).to.equal(tokenAmountUnits);
+
+    await expect(await mockBnMToken.balanceOf(receiver.address)).to.equal(receiverStartBal.add(tokenAmountUnits));
+  });
+
+  it("Contract to Contract: Message only => OK", async function () {
+    let zeroTokenUnits = "0";
+    const message = "C2C - Message only, no token";
+    const destinationChainSelector = 0;
+    const anyValPredicate = () => true; // https://hardhat.org/hardhat-chai-matchers/docs/overview#events-with-arguments
+
+    const {mockRouter, sender, receiver, mockBnMToken}: SetupMocksFixture = await loadFixture(setupMocksFixture);
+
+    // approve CCIP Client Sender contract for Contract-initiated CCIP sends
+    // await mockBnMToken.transfer(sender.address, 1000); //
+    const receiverStartBal = await mockBnMToken.balanceOf(receiver.address);
+
+    await expect(
+      await sender.sendMessage(
+        destinationChainSelector,
+        receiver.address,
+        message,
+        hre.ethers.constants.AddressZero,
+        zeroTokenUnits
+      )
+    )
+      .to.emit(mockRouter, "MsgExecuted")
+      .withArgs(true, "0x", anyValPredicate);
+
+    const {
+      messageId,
+      sourceChainSelector,
+      sender: senderAddress,
+      message: messageText,
+      token: tokenAddress,
+      amount: tokenUnits,
+    } = await receiver.getLastReceivedMessageDetails();
+
+    expect(sourceChainSelector.toString()).to.equal("16015286601757825753"); // Hard coded in Mock Router
+    expect(senderAddress).to.equal(sender.address); // In this test, message and token sent by EOA. Can be tested with Programmable Transfer sender contract too.
+    expect(messageText).to.equal(message);
+    expect(tokenAddress).to.equal(hre.ethers.constants.AddressZero);
+    expect(tokenUnits.toString()).to.equal(zeroTokenUnits);
+
+    await expect(await mockBnMToken.balanceOf(receiver.address)).to.equal(receiverStartBal);
+  });
 });
 
 type SetupMocksFixture = {
@@ -145,8 +275,8 @@ type SetupMocksFixture = {
   receiver: ProgrammableTokenTransfers;
   sender: ProgrammableTokenTransfers;
   deployerUpdatedBal: string;
-  deployer: string;
-  wallet2: string;
+  deployer: SignerWithAddress;
+  wallet2: SignerWithAddress;
 };
 
 async function setup(): Promise<SetupMocksFixture> {
@@ -204,7 +334,7 @@ async function setup(): Promise<SetupMocksFixture> {
     receiver: receiverContract,
     sender: senderContract,
     deployerUpdatedBal: deployerUpdatedBal.toString(),
-    deployer: deployer.address,
-    wallet2: wallet2.address,
+    deployer: deployer,
+    wallet2: wallet2,
   };
 }

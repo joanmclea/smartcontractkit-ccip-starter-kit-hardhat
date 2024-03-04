@@ -49,7 +49,6 @@ contract MockCCIPRouter is IRouter, IRouterClient {
       return (true, "", 0);
 
     bytes memory data = abi.encodeWithSelector(IAny2EVMMessageReceiver.ccipReceive.selector, message);
-
     (success, retData, gasUsed) = CallWithExactGas._callWithExactGasSafeReturnData(
       data,
       receiver,
@@ -99,7 +98,6 @@ contract MockCCIPRouter is IRouter, IRouterClient {
     (bool success, bytes memory retData, ) = _routeMessage(executableMsg, GAS_FOR_CALL_EXACT_CHECK, gasLimit, receiver);
 
     if (!success) revert ReceiverError(retData);
-
     return mockMsgId;
   }
 
